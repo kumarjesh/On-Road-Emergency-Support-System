@@ -18,6 +18,7 @@ import {
 
 export const DispatcherDashboard = () => {
   const { 
+    theme,
     setActiveView, 
     socket, 
     activeEmergency, 
@@ -311,9 +312,9 @@ export const DispatcherDashboard = () => {
         className="glass-panel"
         style={{
           padding: '20px',
-          background: 'var(--bg-card)',
-          border: '1.5px solid var(--border-glass)',
-          boxShadow: 'var(--shadow-card)',
+          background: theme === 'light' ? '#ffffff' : 'var(--bg-card)',
+          border: theme === 'light' ? '1.5px solid #cbd5e1' : '1.5px solid var(--border-glass)',
+          boxShadow: theme === 'light' ? '0 4px 14px rgba(0, 0, 0, 0.06)' : 'var(--shadow-card)',
           borderRadius: 'var(--radius-lg)',
           display: 'flex',
           alignItems: 'center',
@@ -330,26 +331,45 @@ export const DispatcherDashboard = () => {
               boxShadow: '0 0 10px var(--color-emergency)',
               animation: 'float-subtle 1.5s infinite'
             }} />
-            <h2 style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.3px', color: 'var(--text-primary)' }}>
+            <h2 style={{ 
+              fontSize: '18px', 
+              fontWeight: 800, 
+              letterSpacing: '-0.3px', 
+              color: theme === 'light' ? '#0f172a' : 'var(--text-primary)' 
+            }}>
               Dispatch Command Radar
             </h2>
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px', fontWeight: 500 }}>
+          <p style={{ 
+            fontSize: '12px', 
+            color: theme === 'light' ? '#334155' : 'var(--text-secondary)', 
+            marginTop: '4px', 
+            fontWeight: 600 
+          }}>
             Real-time feed of roadside distress requests across regional corridors
           </p>
         </div>
 
         <div style={{
           textAlign: 'right',
-          background: 'rgba(239, 68, 68, 0.15)',
+          background: theme === 'light' ? '#fee2e2' : 'rgba(239, 68, 68, 0.15)',
           padding: '6px 14px',
           borderRadius: 'var(--radius-full)',
-          border: '1px solid rgba(239, 68, 68, 0.3)'
+          border: theme === 'light' ? '1.5px solid #fca5a5' : '1px solid rgba(239, 68, 68, 0.3)'
         }}>
-          <span style={{ fontSize: '16px', fontWeight: 900, color: 'var(--color-emergency)' }}>
+          <span style={{ 
+            fontSize: '16px', 
+            fontWeight: 900, 
+            color: theme === 'light' ? '#dc2626' : 'var(--color-emergency)' 
+          }}>
             {emergencies.filter(e => e.status !== 'resolved' && e.status !== 'cancelled').length}
           </span>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginLeft: '6px' }}>
+          <span style={{ 
+            fontSize: '11px', 
+            color: theme === 'light' ? '#991b1b' : 'var(--text-secondary)', 
+            marginLeft: '6px',
+            fontWeight: 700
+          }}>
             Active Tickets
           </span>
         </div>
@@ -360,7 +380,13 @@ export const DispatcherDashboard = () => {
         {emergencies.length === 0 ? (
           <div 
             className="glass-panel"
-            style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-secondary)' }}
+            style={{ 
+              padding: '40px 20px', 
+              textAlign: 'center', 
+              color: 'var(--text-secondary)',
+              background: theme === 'light' ? '#ffffff' : 'var(--bg-card)',
+              border: theme === 'light' ? '1px solid #cbd5e1' : '1px solid var(--border-glass)'
+            }}
           >
             <Radio size={36} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
             <p style={{ fontWeight: 600 }}>Radar clear. No pending distress signals.</p>
@@ -391,6 +417,9 @@ export const DispatcherDashboard = () => {
               className="glass-panel"
               style={{
                 padding: '16px',
+                background: theme === 'light' ? '#ffffff' : 'var(--bg-card)',
+                border: theme === 'light' ? '1px solid #cbd5e1' : '1px solid var(--border-glass)',
+                boxShadow: theme === 'light' ? '0 4px 12px rgba(0,0,0,0.05)' : 'var(--shadow-card)',
                 borderLeft: `5px solid ${
                   em.status === 'pending' ? 'var(--color-emergency)' :
                   em.status === 'en_route' ? 'var(--color-warning)' :

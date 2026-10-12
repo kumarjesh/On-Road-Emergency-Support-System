@@ -350,3 +350,21 @@ button, a, input, select, textarea, .touch-target {
   background: var(--border-subtle);
   border-radius: var(--radius-full);
 }
+
+/* Explicit light mode overrides for panels and desktop frame */
+[data-theme='light'] .app-viewport.desktop-frame {
+  border: 8px solid #cbd5e1;
+}
+
+[data-theme='light'] .glass-panel {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme='light'] .glass-modal {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12) !important;
+}
+
