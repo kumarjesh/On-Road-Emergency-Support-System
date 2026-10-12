@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { EmergencyProvider, useEmergency } from './context/EmergencyContext';
+import { API_BASE_URL } from './config';
 import { Header } from './components/Header';
 import { SosPulseButton } from './components/SosPulseButton';
 import { ServiceGrid } from './components/ServiceGrid';
@@ -297,7 +298,7 @@ function MainContent() {
     const params = new URLSearchParams(window.location.search);
     const trackId = params.get('track');
     if (trackId) {
-      fetch(`/api/emergency/${trackId}`)
+      fetch(`${API_BASE_URL}/api/emergency/${trackId}`)
         .then(res => res.json())
         .then(data => {
           if (data && data.id) {
@@ -305,7 +306,20 @@ function MainContent() {
             setActiveView('tracking');
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          // Fallback to local store
+          try {
+            const saved = localStorage.getItem('resq_emergencies_list');
+            if (saved) {
+              const list = JSON.parse(saved);
+              const found = list.find(e => e.id === trackId);
+              if (found) {
+                setActiveEmergency(found);
+                setActiveView('tracking');
+              }
+            }
+          } catch (e) {}
+        });
     }
   }, []);
 

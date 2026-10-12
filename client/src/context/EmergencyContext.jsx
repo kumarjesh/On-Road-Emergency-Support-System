@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
+import { API_BASE_URL } from '../config';
 
 const EmergencyContext = createContext();
 
@@ -225,7 +226,7 @@ export const EmergencyProvider = ({ children }) => {
 
     const fallbackToIpGeo = async () => {
       try {
-        const res = await fetch('/api/geolocation/ip');
+        const res = await fetch(`${API_BASE_URL}/api/geolocation/ip`);
         const data = await res.json();
         if (data.success && data.lat && data.lng) {
           updatePosition(data.lat, data.lng, 50, data.addressHint);
@@ -289,7 +290,7 @@ export const EmergencyProvider = ({ children }) => {
 
   // Socket.io initialization
   useEffect(() => {
-    const newSocket = io({
+    const newSocket = io(API_BASE_URL || undefined, {
       transports: ['websocket', 'polling']
     });
 
@@ -409,7 +410,7 @@ export const EmergencyProvider = ({ children }) => {
         notes: notes || `Immediate ${emergencyType} requested via 1-Tap SOS`
       };
 
-      const res = await fetch('/api/emergency/request', {
+      const res = await fetch(`${API_BASE_URL}/api/emergency/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -472,7 +473,7 @@ export const EmergencyProvider = ({ children }) => {
   const fastForwardDemo = async () => {
     if (!activeEmergency) return;
     try {
-      await fetch(`/api/emergency/${activeEmergency.id}/fast-forward`, { method: 'POST' });
+      await fetch(`${API_BASE_URL}/api/emergency/${activeEmergency.id}/fast-forward`, { method: 'POST' });
     } catch (err) {}
 
     // Update locally regardless of backend availability
@@ -494,7 +495,7 @@ export const EmergencyProvider = ({ children }) => {
   // Clear all emergencies & reset simulation
   const clearAllEmergencies = async () => {
     try {
-      await fetch('/api/emergency/clear-all', { method: 'POST' });
+      await fetch(`${API_BASE_URL}/api/emergency/clear-all`, { method: 'POST' });
     } catch (e) {}
     saveEmergenciesStore([]);
     setActiveEmergency(null);
@@ -505,7 +506,7 @@ export const EmergencyProvider = ({ children }) => {
   const cancelEmergency = async () => {
     if (!activeEmergency) return;
     try {
-      await fetch(`/api/emergency/${activeEmergency.id}/status`, {
+      await fetch(`${API_BASE_URL}/api/emergency/${activeEmergency.id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled', note: 'Cancelled by user' })

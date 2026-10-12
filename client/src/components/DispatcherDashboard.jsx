@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useEmergency } from '../context/EmergencyContext';
+import { API_BASE_URL } from '../config';
 import { 
   Radio, 
   Truck, 
@@ -40,7 +41,7 @@ export const DispatcherDashboard = () => {
   const fetchEmergencies = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('/api/emergency');
+      const res = await fetch(`${API_BASE_URL}/api/emergency`);
       if (res.ok) {
         const data = await res.json();
         setEmergencies(data);
@@ -130,7 +131,7 @@ export const DispatcherDashboard = () => {
   const handleUpdateStatus = async (id, status) => {
     let backendItem = null;
     try {
-      const res = await fetch(`/api/emergency/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/emergency/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
@@ -195,7 +196,7 @@ export const DispatcherDashboard = () => {
   // Fast forward simulation
   const handleFastForward = async (id) => {
     try {
-      await fetch(`/api/emergency/${id}/fast-forward`, { method: 'POST' });
+      await fetch(`${API_BASE_URL}/api/emergency/${id}/fast-forward`, { method: 'POST' });
     } catch (e) {}
 
     setEmergencies(prev => {
