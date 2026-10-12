@@ -13,12 +13,14 @@ import {
   Phone, 
   ChevronRight, 
   ArrowLeft,
-  FastForward 
+  FastForward,
+  X 
 } from 'lucide-react';
 
 export const DispatcherDashboard = () => {
   const { 
     theme,
+    changeDisplayMode,
     setActiveView, 
     socket, 
     activeEmergency, 
@@ -30,6 +32,7 @@ export const DispatcherDashboard = () => {
     userProfile
   } = useEmergency();
   
+  const [selectedMapEmergency, setSelectedMapEmergency] = useState(null);
   const [emergencies, setEmergencies] = useState(() => {
     try {
       const saved = localStorage.getItem('resq_emergencies_list');
@@ -608,22 +611,23 @@ export const DispatcherDashboard = () => {
 
                 {/* Inspect button */}
                 <button
-                  onClick={() => {
-                    setActiveEmergency(em);
-                    setActiveView('tracking');
-                  }}
+                  onClick={() => setSelectedMapEmergency(em)}
                   className="touch-target"
                   style={{
                     padding: '8px 14px',
                     borderRadius: '8px',
                     border: '1px solid var(--border-glass)',
-                    background: 'transparent',
-                    color: 'var(--text-primary)',
+                    background: theme === 'light' ? 'rgba(2, 132, 199, 0.1)' : 'rgba(56, 189, 248, 0.15)',
+                    color: 'var(--color-info)',
                     fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer'
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
                   }}
                 >
+                  <Navigation size={14} />
                   View on Map
                 </button>
               </div>
@@ -631,6 +635,198 @@ export const DispatcherDashboard = () => {
           ))
         )}
       </div>
+
+      {/* Dispatcher Incident Map Modal */}
+      {selectedMapEmergency && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9999,
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px'
+        }}>
+          <div 
+            className="glass-modal"
+            style={{
+              width: '100%',
+              maxWidth: '560px',
+              borderRadius: '24px',
+              overflow: 'hidden',
+              background: theme === 'light' ? '#ffffff' : 'var(--bg-surface)',
+              color: theme === 'light' ? '#0f172a' : 'var(--text-primary)',
+              border: theme === 'light' ? '1px solid #cbd5e1' : '1px solid var(--border-glass)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '16px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: '1px solid var(--border-subtle)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  color: 'var(--color-emergency)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <MapPin size={22} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '16px', fontWeight: 800 }}>
+                    Incident Location Radar
+                  </h3>
+                  <p style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                    #{selectedMapEmergency.id} • {selectedMapEmergency.emergencyType}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedMapEmergency(null)}
+                className="touch-target"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* Incident meta bar */}
+              <div style={{
+                padding: '12px 14px',
+                background: theme === 'light' ? '#f8fafc' : 'var(--bg-surface-alt)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '12px',
+                fontSize: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>
+                    📍 {selectedMapEmergency.address || 'Reported Scene Location'}
+                  </span>
+                  <span style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-full)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                    color: 'var(--color-emergency)'
+                  }}>
+                    {selectedMapEmergency.status}
+                  </span>
+                </div>
+                <div style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '11px' }}>
+                  Coordinates: {(selectedMapEmergency.userLocation?.lat || 15.1399).toFixed(4)}°N, {(selectedMapEmergency.userLocation?.lng || 76.9437).toFixed(4)}°E
+                </div>
+                {selectedMapEmergency.contact && (
+                  <div style={{ color: 'var(--text-muted)', fontSize: '11px', marginTop: '2px' }}>
+                    Driver: <strong>{selectedMapEmergency.contact.name}</strong> ({selectedMapEmergency.contact.phone})
+                  </div>
+                )}
+              </div>
+
+              {/* Embedded Interactive Map */}
+              <div style={{
+                width: '100%',
+                height: '220px',
+                borderRadius: '14px',
+                overflow: 'hidden',
+                border: '1px solid var(--border-subtle)',
+                background: '#e2e8f0'
+              }}>
+                <iframe
+                  title="Incident Map Radar"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  scrolling="no"
+                  marginHeight="0"
+                  marginWidth="0"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${(selectedMapEmergency.userLocation?.lng || 76.9437) - 0.015}%2C${(selectedMapEmergency.userLocation?.lat || 15.1399) - 0.015}%2C${(selectedMapEmergency.userLocation?.lng || 76.9437) + 0.015}%2C${(selectedMapEmergency.userLocation?.lat || 15.1399) + 0.015}&layer=mapnik&marker=${selectedMapEmergency.userLocation?.lat || 15.1399}%2C${selectedMapEmergency.userLocation?.lng || 76.9437}`}
+                  style={{ border: 0 }}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${selectedMapEmergency.userLocation?.lat || 15.1399},${selectedMapEmergency.userLocation?.lng || 76.9437}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="touch-target"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    backgroundColor: 'var(--color-info)',
+                    color: '#ffffff',
+                    fontWeight: 800,
+                    fontSize: '13px',
+                    textDecoration: 'none'
+                  }}
+                >
+                  <Navigation size={16} />
+                  Open in Google Maps (Turn-by-Turn Navigation)
+                </a>
+
+                <button
+                  onClick={() => {
+                    setActiveEmergency(selectedMapEmergency);
+                    changeDisplayMode('client');
+                    setActiveView('tracking');
+                    setSelectedMapEmergency(null);
+                  }}
+                  className="touch-target"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    backgroundColor: 'var(--color-emergency)',
+                    color: '#ffffff',
+                    fontWeight: 800,
+                    fontSize: '13px',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Truck size={16} />
+                  Launch Live Route Tracker (Patrol Simulation)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
