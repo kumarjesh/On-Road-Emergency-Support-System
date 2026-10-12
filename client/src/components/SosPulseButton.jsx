@@ -47,14 +47,14 @@ export const SosPulseButton = () => {
           flexDirection: 'column',
           alignItems: 'center',
           gap: '4px',
-          padding: '8px 18px',
-          background: 'var(--bg-glass)',
+          padding: '10px 18px',
+          background: 'var(--bg-card)',
           border: '1px solid var(--border-glass)',
           borderRadius: 'var(--radius-lg)',
           marginBottom: '24px',
           cursor: 'pointer',
           maxWidth: '100%',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+          boxShadow: 'var(--shadow-card)',
           transition: 'all 0.2s'
         }}
       >
@@ -78,11 +78,12 @@ export const SosPulseButton = () => {
           </span>
 
           <span style={{
-            fontSize: '10px',
-            fontWeight: 700,
-            backgroundColor: 'rgba(255,255,255,0.08)',
-            padding: '2px 6px',
-            borderRadius: '4px',
+            fontSize: '11px',
+            fontWeight: 800,
+            backgroundColor: 'var(--bg-surface-alt)',
+            border: '1px solid var(--border-glass)',
+            padding: '2px 8px',
+            borderRadius: '6px',
             color: 'var(--color-info)'
           }}>
             Change Pin ▾
@@ -166,16 +167,19 @@ export const SosPulseButton = () => {
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '8px',
             fontSize: '12px',
-            color: 'var(--text-muted)',
+            fontWeight: 700,
+            color: 'var(--text-secondary)',
             textDecoration: 'none',
-            padding: '6px 12px',
-            borderRadius: 'var(--radius-sm)',
-            border: '1px dashed var(--border-subtle)'
+            padding: '8px 14px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-glass)',
+            boxShadow: 'var(--shadow-card)'
           }}
         >
-          <PhoneCall size={13} style={{ color: 'var(--color-emergency)' }} />
+          <PhoneCall size={14} style={{ color: 'var(--color-emergency)' }} />
           Need Police or Ambulance? Dial 112 Directly
         </a>
       </div>

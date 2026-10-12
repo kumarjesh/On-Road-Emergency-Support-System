@@ -155,7 +155,7 @@ function BottomNavigationBar() {
           border: 'none',
           color: activeView === 'home' ? 'var(--color-emergency)' : 'var(--text-secondary)',
           cursor: 'pointer',
-          fontWeight: activeView === 'home' ? 700 : 500,
+          fontWeight: 800,
           fontSize: '11px'
         }}
       >
@@ -176,7 +176,7 @@ function BottomNavigationBar() {
             border: 'none',
             color: activeView === 'tracking' ? 'var(--color-emergency)' : 'var(--text-secondary)',
             cursor: 'pointer',
-            fontWeight: activeView === 'tracking' ? 700 : 500,
+            fontWeight: 800,
             fontSize: '11px'
           }}
         >
@@ -195,10 +195,10 @@ function BottomNavigationBar() {
           gap: '3px',
           background: 'transparent',
           border: 'none',
-          color: '#25D366',
+          color: '#16a34a',
           cursor: 'pointer',
           fontSize: '11px',
-          fontWeight: 700
+          fontWeight: 800
         }}
       >
         <MessageSquare size={20} />
@@ -217,7 +217,8 @@ function BottomNavigationBar() {
           border: 'none',
           color: 'var(--color-info)',
           cursor: 'pointer',
-          fontSize: '11px'
+          fontSize: '11px',
+          fontWeight: 800
         }}
       >
         <Users size={20} />
@@ -236,7 +237,8 @@ function BottomNavigationBar() {
           border: 'none',
           color: 'var(--text-secondary)',
           cursor: 'pointer',
-          fontSize: '11px'
+          fontSize: '11px',
+          fontWeight: 800
         }}
       >
         <FileText size={20} />
@@ -255,7 +257,8 @@ function BottomNavigationBar() {
           border: 'none',
           color: 'var(--color-warning)',
           cursor: 'pointer',
-          fontSize: '11px'
+          fontSize: '11px',
+          fontWeight: 800
         }}
       >
         <Zap size={20} />

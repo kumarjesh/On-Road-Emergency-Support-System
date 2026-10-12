@@ -185,7 +185,7 @@ export const WhatsAppWizardModal = () => {
         {/* Live GPS Telemetry Pill */}
         <div style={{
           padding: '12px 20px',
-          background: 'rgba(0, 0, 0, 0.25)',
+          background: 'var(--bg-surface-alt)',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
@@ -198,13 +198,13 @@ export const WhatsAppWizardModal = () => {
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: '#10b981',
-              boxShadow: '0 0 8px #10b981'
+              backgroundColor: 'var(--color-success)',
+              boxShadow: '0 0 8px var(--color-success)'
             }} />
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
               GPS: {Number(lat).toFixed(4)}, {Number(lng).toFixed(4)}
             </span>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
               ({locationName})
             </span>
           </div>
@@ -215,16 +215,17 @@ export const WhatsAppWizardModal = () => {
               disabled={isLocating}
               style={{
                 fontSize: '11px',
-                fontWeight: 700,
+                fontWeight: 800,
                 color: 'var(--color-warning)',
-                background: 'rgba(245, 158, 11, 0.1)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-glass)',
                 borderRadius: '6px',
-                padding: '4px 8px',
+                padding: '5px 10px',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '4px'
+                gap: '4px',
+                boxShadow: 'var(--shadow-card)'
               }}
               title="Refresh device GPS or ISP geolocation"
             >
@@ -238,8 +239,8 @@ export const WhatsAppWizardModal = () => {
               rel="noopener noreferrer"
               style={{
                 fontSize: '11px',
-                fontWeight: 700,
-                color: '#38bdf8',
+                fontWeight: 800,
+                color: 'var(--color-info)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
@@ -623,12 +624,12 @@ export const WhatsAppWizardModal = () => {
         <div style={{
           padding: '14px 20px',
           borderTop: '1px solid var(--border-glass)',
-          background: 'rgba(0, 0, 0, 0.25)',
+          background: 'var(--bg-surface-alt)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
             Opens directly in web.whatsapp.com
           </span>
           <button
@@ -637,12 +638,13 @@ export const WhatsAppWizardModal = () => {
             style={{
               padding: '8px 18px',
               borderRadius: '8px',
-              background: 'var(--bg-card-hover)',
+              background: 'var(--bg-card)',
               border: '1px solid var(--border-glass)',
               color: 'var(--text-primary)',
               fontSize: '12px',
               fontWeight: 700,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-card)'
             }}
           >
             Close

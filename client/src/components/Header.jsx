@@ -99,6 +99,40 @@ export const Header = () => {
 
         {/* Global Action Icons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {/* PROMINENT THEME TOGGLE: Guaranteed 100% visible on all devices */}
+          <button
+            onClick={toggleTheme}
+            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            className="touch-target"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              border: '1.5px solid var(--border-glass)',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '12px',
+              boxShadow: 'var(--shadow-card)',
+              flexShrink: 0
+            }}
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun size={16} style={{ color: '#f59e0b' }} />
+                <span>Light</span>
+              </>
+            ) : (
+              <>
+                <Moon size={16} style={{ color: '#4f46e5' }} />
+                <span>Dark</span>
+              </>
+            )}
+          </button>
+
           {/* Location Picker trigger */}
           <button
             onClick={() => setIsLocationPickerOpen(true)}
@@ -108,101 +142,17 @@ export const Header = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '40px',
-              height: '40px',
+              width: '38px',
+              height: '38px',
               borderRadius: '10px',
               border: '1px solid rgba(239, 68, 68, 0.3)',
               backgroundColor: 'rgba(239, 68, 68, 0.1)',
               color: 'var(--color-emergency)',
-              cursor: 'pointer'
-            }}
-          >
-            <MapPin size={18} />
-          </button>
-
-          {/* WhatsApp Web Wizard Button */}
-          <button
-            onClick={() => setIsWhatsAppWizardOpen(true)}
-            title="WhatsApp Web SOS Wizard"
-            className="touch-target"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              border: '1px solid rgba(37, 211, 102, 0.4)',
-              backgroundColor: 'rgba(37, 211, 102, 0.15)',
-              color: '#25D366',
               cursor: 'pointer',
-              boxShadow: '0 0 10px rgba(37, 211, 102, 0.2)'
+              flexShrink: 0
             }}
           >
-            <MessageSquare size={18} />
-          </button>
-
-          {/* Emergency Contacts Hub Button */}
-          <button
-            onClick={() => setIsContactsModalOpen(true)}
-            title="Emergency Contacts Hub"
-            className="touch-target"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              border: '1px solid rgba(56, 189, 248, 0.35)',
-              backgroundColor: 'rgba(56, 189, 248, 0.12)',
-              color: 'var(--color-info)',
-              cursor: 'pointer',
-              position: 'relative'
-            }}
-          >
-            <Users size={18} />
-            {emergencyContacts && emergencyContacts.length > 0 && (
-              <span style={{
-                position: 'absolute',
-                top: '-4px',
-                right: '-4px',
-                width: '18px',
-                height: '18px',
-                borderRadius: '50%',
-                background: '#10b981',
-                color: '#fff',
-                fontSize: '10px',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 0 6px #10b981'
-              }}>
-                {emergencyContacts.length}
-              </span>
-            )}
-          </button>
-
-          {/* Night Strobe Beacon Button */}
-          <button
-            onClick={() => setIsStrobeOpen(true)}
-            title="Night Highway Hazard Beacon"
-            className="touch-target"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              border: '1px solid rgba(245, 158, 11, 0.4)',
-              backgroundColor: 'rgba(245, 158, 11, 0.15)',
-              color: 'var(--color-warning)',
-              cursor: 'pointer'
-            }}
-          >
-            <Zap size={18} />
+            <MapPin size={17} />
           </button>
 
           {/* Vehicle Profile */}
@@ -214,50 +164,111 @@ export const Header = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '40px',
-              height: '40px',
+              width: '38px',
+              height: '38px',
               borderRadius: '10px',
               border: '1px solid var(--border-glass)',
               backgroundColor: 'var(--bg-card)',
               color: 'var(--text-primary)',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              flexShrink: 0
             }}
           >
-            <Car size={18} />
+            <Car size={17} />
           </button>
 
-          {/* Theme Toggle */}
+          {/* Secondary buttons: Hidden on narrow mobile screens (already in bottom nav bar) */}
           <button
-            onClick={toggleTheme}
-            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-            className="touch-target"
+            onClick={() => setIsWhatsAppWizardOpen(true)}
+            title="WhatsApp Web SOS Wizard"
+            className="touch-target header-desktop-only"
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '40px',
-              height: '40px',
+              width: '38px',
+              height: '38px',
               borderRadius: '10px',
-              border: '1px solid var(--border-glass)',
-              backgroundColor: 'var(--bg-card)',
-              color: 'var(--text-primary)',
+              border: '1px solid rgba(37, 211, 102, 0.4)',
+              backgroundColor: 'rgba(37, 211, 102, 0.15)',
+              color: '#25D366',
               cursor: 'pointer'
             }}
           >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            <MessageSquare size={17} />
+          </button>
+
+          <button
+            onClick={() => setIsContactsModalOpen(true)}
+            title="Emergency Contacts Hub"
+            className="touch-target header-desktop-only"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              backgroundColor: 'rgba(56, 189, 248, 0.12)',
+              color: 'var(--color-info)',
+              cursor: 'pointer',
+              position: 'relative'
+            }}
+          >
+            <Users size={17} />
+            {emergencyContacts && emergencyContacts.length > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-4px',
+                width: '16px',
+                height: '16px',
+                borderRadius: '50%',
+                background: '#10b981',
+                color: '#fff',
+                fontSize: '10px',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {emergencyContacts.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setIsStrobeOpen(true)}
+            title="Night Highway Hazard Beacon"
+            className="touch-target header-desktop-only"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              backgroundColor: 'rgba(245, 158, 11, 0.15)',
+              color: 'var(--color-warning)',
+              cursor: 'pointer'
+            }}
+          >
+            <Zap size={17} />
           </button>
 
           {/* Reset / Clear All Simulation */}
           <button
             onClick={clearAllEmergencies}
             title="Reset All Tickets & Start Clean"
-            className="touch-target"
+            className="touch-target header-desktop-only"
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '40px',
-              height: '40px',
+              width: '38px',
+              height: '38px',
               borderRadius: '10px',
               border: '1px solid var(--border-subtle)',
               backgroundColor: 'transparent',
@@ -265,7 +276,7 @@ export const Header = () => {
               cursor: 'pointer'
             }}
           >
-            <RotateCcw size={16} />
+            <RotateCcw size={15} />
           </button>
         </div>
       </div>
@@ -288,7 +299,7 @@ export const Header = () => {
             changeDisplayMode('split');
             setActiveView('home');
           }}
-          className="touch-target"
+          className="touch-target header-desktop-only"
           style={{
             flex: 1,
             display: 'flex',
@@ -297,8 +308,8 @@ export const Header = () => {
             gap: '6px',
             padding: '6px 10px',
             borderRadius: '8px',
-            border: displayMode === 'split' ? '1px solid var(--color-warning)' : '1px solid var(--border-glass)',
-            background: displayMode === 'split' ? 'rgba(245, 158, 11, 0.2)' : 'var(--bg-card)',
+            border: displayMode === 'split' ? '1.5px solid var(--color-warning)' : '1px solid var(--border-glass)',
+            background: displayMode === 'split' ? 'rgba(245, 158, 11, 0.15)' : 'var(--bg-card)',
             color: displayMode === 'split' ? 'var(--color-warning)' : 'var(--text-secondary)',
             fontSize: '12px',
             fontWeight: 700,
@@ -307,7 +318,7 @@ export const Header = () => {
           }}
         >
           <Columns size={14} />
-          Split Screen (Client + Server)
+          Split Screen
         </button>
 
         <button

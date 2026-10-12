@@ -10,8 +10,9 @@ export const CrashSensorWidget = ({ telemetry, onSimulateImpact }) => {
       style={{
         margin: '0 20px 20px',
         padding: '14px 16px',
-        border: '1px solid rgba(56, 189, 248, 0.25)',
-        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%)'
+        border: '1px solid var(--border-glass)',
+        background: 'var(--bg-card)',
+        boxShadow: 'var(--shadow-card)'
       }}
     >
       <div 
