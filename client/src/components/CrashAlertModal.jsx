@@ -123,7 +123,13 @@ export const CrashAlertModal = ({
         {/* Action Buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <button
-            onClick={onCancel}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              try { if (navigator.vibrate) navigator.vibrate([100]); } catch (err) {}
+              onCancel();
+            }}
             className="touch-target"
             style={{
               padding: '14px',

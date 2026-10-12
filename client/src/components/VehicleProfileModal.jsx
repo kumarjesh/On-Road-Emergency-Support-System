@@ -122,14 +122,15 @@ export const VehicleProfileModal = () => {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          {/* Driver Name & Blood Group */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 Driver Name
               </label>
               <input
                 type="text"
-                value={formData.name}
+                value={formData.name || ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 style={{
                   width: '100%',
@@ -145,24 +146,54 @@ export const VehicleProfileModal = () => {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                Driver Phone
+                🩸 Blood Group
               </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              <select
+                value={formData.bloodGroup || 'O+'}
+                onChange={(e) => setFormData({ ...formData, bloodGroup: e.target.value })}
                 style={{
                   width: '100%',
-                  padding: '12px 14px',
+                  padding: '12px 10px',
                   borderRadius: '12px',
                   border: '1px solid var(--border-glass)',
                   backgroundColor: 'var(--bg-card)',
-                  color: 'var(--text-primary)',
-                  fontSize: '14px'
+                  color: 'var(--color-emergency)',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  cursor: 'pointer'
                 }}
-                required
-              />
+              >
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
             </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+              Driver Phone Number
+            </label>
+            <input
+              type="tel"
+              value={formData.phone || ''}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                border: '1px solid var(--border-glass)',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                fontSize: '14px'
+              }}
+              required
+            />
           </div>
 
           <div>

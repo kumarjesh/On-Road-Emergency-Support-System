@@ -641,6 +641,30 @@ export const LiveTracking = () => {
           )}
         </div>
 
+        <button
+          onClick={cancelEmergency}
+          className="touch-target"
+          style={{
+            width: '100%',
+            padding: '12px',
+            fontSize: '13px',
+            fontWeight: 800,
+            borderRadius: 'var(--radius-sm)',
+            background: 'rgba(239, 68, 68, 0.15)',
+            border: '1.5px solid var(--color-emergency)',
+            color: 'var(--color-emergency)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            marginTop: '6px'
+          }}
+        >
+          <AlertTriangle size={16} />
+          Cancel Emergency (False Alarm / Safe Now)
+        </button>
+
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           <button
             onClick={() => setActiveView('home')}

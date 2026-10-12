@@ -311,7 +311,10 @@ export const DispatcherDashboard = () => {
         className="glass-panel"
         style={{
           padding: '20px',
-          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)',
+          background: 'var(--bg-card)',
+          border: '1.5px solid var(--border-glass)',
+          boxShadow: 'var(--shadow-card)',
+          borderRadius: 'var(--radius-lg)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
@@ -323,15 +326,15 @@ export const DispatcherDashboard = () => {
               width: '10px',
               height: '10px',
               borderRadius: '50%',
-              backgroundColor: '#ef4444',
-              boxShadow: '0 0 10px #ef4444',
+              backgroundColor: 'var(--color-emergency)',
+              boxShadow: '0 0 10px var(--color-emergency)',
               animation: 'float-subtle 1.5s infinite'
             }} />
-            <h2 style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.3px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.3px', color: 'var(--text-primary)' }}>
               Dispatch Command Radar
             </h2>
           </div>
-          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px', fontWeight: 500 }}>
             Real-time feed of roadside distress requests across regional corridors
           </p>
         </div>
@@ -404,7 +407,9 @@ export const DispatcherDashboard = () => {
                     <span style={{
                       fontSize: '11px',
                       fontWeight: 800,
-                      backgroundColor: 'rgba(255,255,255,0.08)',
+                      backgroundColor: 'var(--bg-surface-alt)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-primary)',
                       padding: '2px 6px',
                       borderRadius: '4px',
                       fontFamily: 'var(--font-mono)'
@@ -455,7 +460,8 @@ export const DispatcherDashboard = () => {
                 gridTemplateColumns: '1fr 1fr',
                 gap: '8px',
                 padding: '10px 12px',
-                background: 'rgba(0,0,0,0.15)',
+                background: 'var(--bg-surface-alt)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '10px',
                 fontSize: '12px'
               }}>

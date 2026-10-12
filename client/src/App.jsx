@@ -347,18 +347,19 @@ function MainContent() {
               flex: '1 1 430px',
               maxWidth: '480px',
               background: 'var(--bg-app)',
-              border: '4px solid #1e293b',
+              border: '3px solid var(--border-glass)',
               borderRadius: '32px',
               overflow: 'hidden',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+              boxShadow: 'var(--shadow-card)',
               minHeight: '800px',
               display: 'flex',
               flexDirection: 'column'
             }}>
               <div style={{
                 padding: '12px 16px',
-                background: '#1e293b',
-                color: '#f8fafc',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                borderBottom: '1px solid var(--border-subtle)',
                 fontSize: '12px',
                 fontWeight: 800,
                 letterSpacing: '0.5px',
