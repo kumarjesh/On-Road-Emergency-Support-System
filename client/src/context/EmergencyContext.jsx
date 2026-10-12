@@ -23,6 +23,23 @@ export const EmergencyProvider = ({ children }) => {
   const [isContactsModalOpen, setIsContactsModalOpen] = useState(false);
   const [isWhatsAppWizardOpen, setIsWhatsAppWizardOpen] = useState(false);
 
+  // Cloud/Vercel Standalone Emergencies Store (Hybrid Engine)
+  const [emergenciesStore, setEmergenciesStore] = useState(() => {
+    const saved = localStorage.getItem('resq_emergencies_list');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return [];
+  });
+
+  const saveEmergenciesStore = (list) => {
+    setEmergenciesStore(list);
+    localStorage.setItem('resq_emergencies_list', JSON.stringify(list));
+    try {
+      window.dispatchEvent(new CustomEvent('resq_emergencies_sync', { detail: list }));
+    } catch (e) {}
+  };
+
   // Saved Emergency Contacts with LocalStorage persistence
   const [emergencyContacts, setEmergencyContacts] = useState(() => {
     const saved = localStorage.getItem('resq_emergency_contacts');
@@ -312,6 +329,61 @@ export const EmergencyProvider = ({ children }) => {
     }
   }, [socket, activeEmergency?.id]);
 
+  // Standalone / Vercel In-Browser Rescuer Movement Simulation Loop
+  // (Runs when socket is disconnected or backend is unreachable, ensuring mobile/cloud standalone demo works 100%)
+  useEffect(() => {
+    if (!activeEmergency || activeEmergency.status !== 'en_route') return;
+    // If connected to a live server websocket, let the real server handle simulation updates
+    if (socket && socket.connected) return;
+
+    const interval = setInterval(() => {
+      setActiveEmergency(prev => {
+        if (!prev || prev.status !== 'en_route') return prev;
+        const uLat = prev.userLocation?.lat;
+        const uLng = prev.userLocation?.lng;
+        const rLat = prev.rescuerLocation?.lat || (uLat + 0.02);
+        const rLng = prev.rescuerLocation?.lng || (uLng + 0.02);
+
+        // Interpolate 12% closer per tick
+        const nextLat = rLat + (uLat - rLat) * 0.12;
+        const nextLng = rLng + (uLng - rLng) * 0.12;
+
+        // Calculate remaining distance in km
+        const dLat = (uLat - nextLat) * 111;
+        const dLng = (uLng - nextLng) * 111 * Math.cos(uLat * (Math.PI / 180));
+        const distKm = Math.max(0, Math.sqrt(dLat * dLat + dLng * dLng));
+        const eta = Math.max(1, Math.round(distKm * 2.5));
+
+        if (distKm < 0.08) {
+          const arrived = {
+            ...prev,
+            status: 'arrived',
+            rescuerLocation: { lat: uLat, lng: uLng },
+            distanceKm: 0,
+            etaMinutes: 0,
+            timeline: [
+              ...(prev.timeline || []),
+              { status: 'arrived', label: 'Rescuer arrived on scene', time: new Date().toISOString() }
+            ]
+          };
+          saveEmergenciesStore(emergenciesStore.map(e => e.id === arrived.id ? arrived : e));
+          return arrived;
+        }
+
+        const updated = {
+          ...prev,
+          rescuerLocation: { lat: nextLat, lng: nextLng },
+          distanceKm: Number(distKm.toFixed(1)),
+          etaMinutes: eta
+        };
+        saveEmergenciesStore(emergenciesStore.map(e => e.id === updated.id ? updated : e));
+        return updated;
+      });
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [activeEmergency?.id, activeEmergency?.status, socket?.connected, emergenciesStore]);
+
   // Trigger Emergency Request (1-Tap SOS or Service Grid)
   const triggerEmergency = async (emergencyType = 'Towing', severity = 'high', notes = '') => {
     setIsRequesting(true);
@@ -347,37 +419,50 @@ export const EmergencyProvider = ({ children }) => {
 
       const data = await res.json();
       setActiveEmergency(data);
+      saveEmergenciesStore([data, ...emergenciesStore.filter(e => e.id !== data.id)]);
       setActiveView('tracking');
       return data;
     } catch (err) {
-      console.error('SOS dispatch error:', err);
-      // Fallback emergency object
-      const fallback = {
+      console.warn('Backend server offline or running in Vercel Cloud mode. Using client-side hybrid dispatcher engine.');
+      // Standalone Emergency Ticket: STAYS IN PENDING UNTIL DISPATCHER ACCEPTS
+      const fallbackTicket = {
         id: 'REQ-' + Math.floor(100000 + Math.random() * 900000),
-        status: 'assigned',
+        status: 'pending',
         emergencyType,
+        severity,
         createdAt: new Date().toISOString(),
-        userLocation: { lat: coords.lat, lng: coords.lng },
+        userLocation: { lat: coords.lat, lng: coords.lng, accuracy: coords.accuracy },
         address: coords.addressHint,
-        rescuerLocation: { lat: coords.lat + 0.015, lng: coords.lng + 0.012 },
-        distanceKm: 2.3,
-        etaMinutes: 6,
+        rescuerLocation: { lat: coords.lat + 0.018, lng: coords.lng + 0.015 },
+        distanceKm: 2.8,
+        etaMinutes: 7,
+        vehicle: {
+          make: userProfile.vehicleMake,
+          plate: userProfile.vehiclePlate
+        },
+        contact: {
+          name: userProfile.name,
+          phone: userProfile.phone,
+          emergencyContactPhone: userProfile.emergencyContactPhone
+        },
         provider: {
-          name: 'Vikram Singh',
+          name: 'Vikram Singh (Highway Patrol)',
           phone: '+91 98765 43210',
-          vehicleType: 'Heavy Flatbed Tow Truck',
+          vehicleType: 'Emergency Rapid Response Unit',
           vehiclePlate: 'DL 01 AB 9988',
           rating: 4.9,
           photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80'
         },
         timeline: [
-          { status: 'pending', label: 'Emergency Alert Sent', time: new Date().toISOString() },
-          { status: 'assigned', label: 'Vikram Singh Dispatched', time: new Date().toISOString() }
+          { status: 'pending', label: 'Emergency SOS Broadcasted', time: new Date().toISOString() }
         ]
       };
-      setActiveEmergency(fallback);
+
+      const updatedList = [fallbackTicket, ...emergenciesStore.filter(e => e.id !== fallbackTicket.id)];
+      saveEmergenciesStore(updatedList);
+      setActiveEmergency(fallbackTicket);
       setActiveView('tracking');
-      return fallback;
+      return fallbackTicket;
     } finally {
       setIsRequesting(false);
     }
@@ -387,21 +472,23 @@ export const EmergencyProvider = ({ children }) => {
   const fastForwardDemo = async () => {
     if (!activeEmergency) return;
     try {
-      const res = await fetch(`/api/emergency/${activeEmergency.id}/fast-forward`, {
-        method: 'POST'
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setActiveEmergency(data);
-      }
-    } catch (err) {
-      setActiveEmergency(prev => ({
-        ...prev,
-        status: 'arrived',
-        distanceKm: 0,
-        etaMinutes: 0
-      }));
-    }
+      await fetch(`/api/emergency/${activeEmergency.id}/fast-forward`, { method: 'POST' });
+    } catch (err) {}
+
+    // Update locally regardless of backend availability
+    const arrivedTicket = {
+      ...activeEmergency,
+      status: 'arrived',
+      rescuerLocation: { lat: activeEmergency.userLocation.lat, lng: activeEmergency.userLocation.lng },
+      distanceKm: 0,
+      etaMinutes: 0,
+      timeline: [
+        ...(activeEmergency.timeline || []),
+        { status: 'arrived', label: 'Rescuer arrived on scene (Fast-Forward Demo)', time: new Date().toISOString() }
+      ]
+    };
+    setActiveEmergency(arrivedTicket);
+    saveEmergenciesStore(emergenciesStore.map(e => e.id === arrivedTicket.id ? arrivedTicket : e));
   };
 
   // Clear all emergencies & reset simulation
@@ -409,6 +496,7 @@ export const EmergencyProvider = ({ children }) => {
     try {
       await fetch('/api/emergency/clear-all', { method: 'POST' });
     } catch (e) {}
+    saveEmergenciesStore([]);
     setActiveEmergency(null);
     setActiveView('home');
   };
@@ -423,6 +511,7 @@ export const EmergencyProvider = ({ children }) => {
         body: JSON.stringify({ status: 'cancelled', note: 'Cancelled by user' })
       });
     } catch (e) {}
+    saveEmergenciesStore(emergenciesStore.filter(e => e.id !== activeEmergency.id));
     setActiveEmergency(null);
     setActiveView('home');
   };
@@ -513,6 +602,8 @@ export const EmergencyProvider = ({ children }) => {
         fastForwardDemo,
         cancelEmergency,
         clearAllEmergencies,
+        emergenciesStore,
+        saveEmergenciesStore,
         socket
       }}
     >

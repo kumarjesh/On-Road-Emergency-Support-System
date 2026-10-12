@@ -16,9 +16,26 @@ import {
 } from 'lucide-react';
 
 export const DispatcherDashboard = () => {
-  const { setActiveView, socket, activeEmergency, setActiveEmergency } = useEmergency();
-  const [emergencies, setEmergencies] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { 
+    setActiveView, 
+    socket, 
+    activeEmergency, 
+    setActiveEmergency, 
+    emergenciesStore, 
+    saveEmergenciesStore, 
+    clearAllEmergencies,
+    coords,
+    userProfile
+  } = useEmergency();
+  
+  const [emergencies, setEmergencies] = useState(() => {
+    try {
+      const saved = localStorage.getItem('resq_emergencies_list');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return emergenciesStore || [];
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchEmergencies = async () => {
     try {
@@ -27,16 +44,45 @@ export const DispatcherDashboard = () => {
       if (res.ok) {
         const data = await res.json();
         setEmergencies(data);
+        saveEmergenciesStore(data);
+        return;
       }
     } catch (e) {
-      console.error(e);
+      console.warn('Backend server offline or running in Vercel Cloud mode. Loading from local store.');
     } finally {
       setIsLoading(false);
     }
+
+    // Fallback: load from emergenciesStore or localStorage
+    try {
+      const saved = localStorage.getItem('resq_emergencies_list');
+      if (saved) {
+        setEmergencies(JSON.parse(saved));
+      } else if (emergenciesStore && emergenciesStore.length > 0) {
+        setEmergencies(emergenciesStore);
+      }
+    } catch (err) {}
   };
 
   useEffect(() => {
     fetchEmergencies();
+
+    // Listen to custom cross-component sync events (for Vercel standalone operation)
+    const handleSync = (e) => {
+      if (e.detail) {
+        setEmergencies(e.detail);
+      }
+    };
+    window.addEventListener('resq_emergencies_sync', handleSync);
+
+    const handleStorage = (e) => {
+      if (e.key === 'resq_emergencies_list' && e.newValue) {
+        try {
+          setEmergencies(JSON.parse(e.newValue));
+        } catch (err) {}
+      }
+    };
+    window.addEventListener('storage', handleStorage);
 
     if (socket) {
       socket.emit('join_dispatchers');
@@ -58,18 +104,31 @@ export const DispatcherDashboard = () => {
           osc.stop(ctx.currentTime + 0.45);
         } catch (e) {}
 
-        setEmergencies(prev => [newItem, ...prev.filter(e => e.id !== newItem.id)]);
+        setEmergencies(prev => {
+          const updated = [newItem, ...prev.filter(e => e.id !== newItem.id)];
+          saveEmergenciesStore(updated);
+          return updated;
+        });
       });
 
       socket.on('emergency_update', (updatedItem) => {
-        setEmergencies(prev => prev.map(e => (e.id === updatedItem.id ? updatedItem : e)));
+        setEmergencies(prev => {
+          const updated = prev.map(e => (e.id === updatedItem.id ? updatedItem : e));
+          saveEmergenciesStore(updated);
+          return updated;
+        });
       });
     }
+
+    return () => {
+      window.removeEventListener('resq_emergencies_sync', handleSync);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, [socket]);
 
-
-  // Update Status action from Dispatcher console
+  // Update Status action from Dispatcher console (works with both Node backend and Vercel standalone)
   const handleUpdateStatus = async (id, status) => {
+    let backendItem = null;
     try {
       const res = await fetch(`/api/emergency/${id}/status`, {
         method: 'PATCH',
@@ -77,29 +136,129 @@ export const DispatcherDashboard = () => {
         body: JSON.stringify({ status })
       });
       if (res.ok) {
-        const updated = await res.json();
-        setEmergencies(prev => prev.map(e => (e.id === id ? updated : e)));
-        if (activeEmergency?.id === id) {
-          setActiveEmergency(updated);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  // Fast forward
-  const handleFastForward = async (id) => {
-    try {
-      const res = await fetch(`/api/emergency/${id}/fast-forward`, { method: 'POST' });
-      if (res.ok) {
-        const updated = await res.json();
-        setEmergencies(prev => prev.map(e => (e.id === id ? updated : e)));
-        if (activeEmergency?.id === id) {
-          setActiveEmergency(updated);
-        }
+        backendItem = await res.json();
       }
     } catch (e) {}
+
+    // Update in-browser store and UI state
+    setEmergencies(prev => {
+      const updatedList = prev.map(item => {
+        if (item.id !== id) return item;
+        const current = backendItem || {
+          ...item,
+          status,
+          timeline: [
+            ...(item.timeline || []),
+            { status, label: `Status changed to ${status.replace('_', ' ').toUpperCase()}`, time: new Date().toISOString() }
+          ]
+        };
+
+        if (status === 'assigned' || status === 'en_route') {
+          current.status = status;
+          current.etaMinutes = current.etaMinutes || 6;
+          current.distanceKm = current.distanceKm || 2.4;
+          if (!current.provider) {
+            current.provider = {
+              name: 'Vikram Singh (Highway Patrol)',
+              phone: '+91 98765 43210',
+              vehicleType: 'Emergency Rapid Response Unit',
+              vehiclePlate: 'DL 01 AB 9988',
+              rating: 4.9,
+              photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80'
+            };
+          }
+        } else if (status === 'arrived') {
+          current.status = 'arrived';
+          current.etaMinutes = 0;
+          current.distanceKm = 0;
+          if (current.userLocation) {
+            current.rescuerLocation = { ...current.userLocation };
+          }
+        } else if (status === 'resolved') {
+          current.status = 'resolved';
+          current.etaMinutes = 0;
+          current.distanceKm = 0;
+        }
+        return current;
+      });
+
+      saveEmergenciesStore(updatedList);
+
+      const target = updatedList.find(e => e.id === id);
+      if (target && activeEmergency?.id === id) {
+        setActiveEmergency(target);
+      }
+      return updatedList;
+    });
+  };
+
+  // Fast forward simulation
+  const handleFastForward = async (id) => {
+    try {
+      await fetch(`/api/emergency/${id}/fast-forward`, { method: 'POST' });
+    } catch (e) {}
+
+    setEmergencies(prev => {
+      const updatedList = prev.map(item => {
+        if (item.id !== id) return item;
+        return {
+          ...item,
+          status: 'arrived',
+          rescuerLocation: { lat: item.userLocation?.lat || 28.6304, lng: item.userLocation?.lng || 77.2177 },
+          distanceKm: 0,
+          etaMinutes: 0,
+          timeline: [
+            ...(item.timeline || []),
+            { status: 'arrived', label: 'Rescuer arrived on scene (Fast-Forward Simulation)', time: new Date().toISOString() }
+          ]
+        };
+      });
+
+      saveEmergenciesStore(updatedList);
+      const target = updatedList.find(e => e.id === id);
+      if (target && activeEmergency?.id === id) {
+        setActiveEmergency(target);
+      }
+      return updatedList;
+    });
+  };
+
+  // Create Sample Incident for instant testing
+  const handleCreateSampleIncident = () => {
+    const sample = {
+      id: 'REQ-' + Math.floor(100000 + Math.random() * 900000),
+      status: 'pending',
+      emergencyType: 'Accident / Collision',
+      severity: 'critical',
+      createdAt: new Date().toISOString(),
+      userLocation: { lat: coords.lat, lng: coords.lng, accuracy: coords.accuracy },
+      address: coords.addressHint || 'Highway NH-44, Sector 21 Junction',
+      rescuerLocation: { lat: coords.lat + 0.015, lng: coords.lng + 0.018 },
+      distanceKm: 2.6,
+      etaMinutes: 6,
+      vehicle: {
+        make: userProfile.vehicleMake || 'Hyundai Creta',
+        plate: userProfile.vehiclePlate || 'KA 01 AB 4321'
+      },
+      contact: {
+        name: userProfile.name || 'Rajesh Kumar',
+        phone: userProfile.phone || '+91 63600 14779'
+      },
+      provider: {
+        name: 'Vikram Singh (Highway Patrol)',
+        phone: '+91 98765 43210',
+        vehicleType: 'Emergency Rapid Response Unit',
+        vehiclePlate: 'DL 01 AB 9988',
+        rating: 4.9,
+        photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80'
+      },
+      timeline: [
+        { status: 'pending', label: 'Emergency SOS Broadcasted', time: new Date().toISOString() }
+      ]
+    };
+    const updated = [sample, ...emergencies.filter(e => e.id !== sample.id)];
+    setEmergencies(updated);
+    saveEmergenciesStore(updated);
   };
 
   return (
@@ -201,7 +360,25 @@ export const DispatcherDashboard = () => {
           >
             <Radio size={36} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
             <p style={{ fontWeight: 600 }}>Radar clear. No pending distress signals.</p>
-            <p style={{ fontSize: '12px', marginTop: '4px' }}>Switch to the user app and tap SOS to test dispatch.</p>
+            <p style={{ fontSize: '12px', marginTop: '4px', marginBottom: '16px' }}>
+              Switch to the user app and tap SOS to test dispatch, or generate an incident below.
+            </p>
+            <button
+              onClick={handleCreateSampleIncident}
+              className="touch-target"
+              style={{
+                padding: '10px 20px',
+                borderRadius: '10px',
+                background: 'var(--color-emergency)',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 700,
+                fontSize: '12px',
+                cursor: 'pointer'
+              }}
+            >
+              + Simulate Inbound Distress Call
+            </button>
           </div>
         ) : (
           emergencies.map((em) => (

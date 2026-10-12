@@ -1,1 +1,82 @@
-[]
+[
+  {
+    "emergencyType": "Towing",
+    "severity": "critical",
+    "status": "resolved",
+    "isCrashDetected": false,
+    "crashTelemetry": null,
+    "userLocation": {
+      "lat": 19.0467,
+      "lng": 72.8522,
+      "accuracy": 5000
+    },
+    "address": "G/N Ward, Maharashtra",
+    "vehicle": {
+      "make": "Hyundai Creta (Black)",
+      "plate": "DL 08 CA 9412"
+    },
+    "contact": {
+      "name": "Rajesh",
+      "phone": "+91 6360014779",
+      "emergencyContactPhone": "+919482812549"
+    },
+    "notes": "Critical 1-Tap SOS Activated",
+    "provider": {
+      "id": "prov-001",
+      "name": "Vikram Singh",
+      "phone": "+91 98765 43210",
+      "vehicleType": "Heavy Flatbed Tow Truck",
+      "vehiclePlate": "DL 01 AB 9988",
+      "rating": 4.9,
+      "tripsCompleted": 420,
+      "photo": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80",
+      "services": [
+        "towing",
+        "flat-tire",
+        "battery"
+      ]
+    },
+    "initialRescuerLocation": {
+      "lat": 19.070700000000002,
+      "lng": 72.8702
+    },
+    "rescuerLocation": {
+      "lat": 19.0467,
+      "lng": 72.8522
+    },
+    "routeStepsTotal": 10,
+    "currentStep": 0,
+    "distanceKm": 0,
+    "etaMinutes": 0,
+    "timeline": [
+      {
+        "status": "pending",
+        "label": "Emergency Alert Broadcasted",
+        "time": "2026-10-12T12:01:36.032Z"
+      },
+      {
+        "status": "assigned",
+        "label": "Status changed to ASSIGNED",
+        "time": "2026-10-12T12:01:44.463Z"
+      },
+      {
+        "status": "en_route",
+        "label": "Status changed to EN ROUTE",
+        "time": "2026-10-12T12:01:45.836Z"
+      },
+      {
+        "status": "arrived",
+        "label": "Rescuer arrived on scene (Fast-Forward Demo)",
+        "time": "2026-10-12T12:01:47.055Z"
+      },
+      {
+        "status": "resolved",
+        "label": "Status changed to RESOLVED",
+        "time": "2026-10-12T12:01:53.445Z"
+      }
+    ],
+    "id": "REQ-790745",
+    "createdAt": "2026-10-12T12:01:36.032Z",
+    "updatedAt": "2026-10-12T12:01:53.445Z"
+  }
+]
