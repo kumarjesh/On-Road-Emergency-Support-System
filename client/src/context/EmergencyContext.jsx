@@ -15,6 +15,7 @@ export const EmergencyProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [activeEmergency, setActiveEmergency] = useState(null);
   const [isRequesting, setIsRequesting] = useState(false);
+  const [activeView, setActiveView] = useState('home'); // 'home', 'services', 'tracking', 'dispatcher', 'safety', 'strobe'
   const [displayMode, setDisplayMode] = useState(() => {
     const saved = localStorage.getItem('resq_display_mode');
     if (saved) return saved;
@@ -23,6 +24,7 @@ export const EmergencyProvider = ({ children }) => {
     }
     return 'client';
   });
+  const [isStrobeOpen, setIsStrobeOpen] = useState(false);
   const [isSafetyOpen, setIsSafetyOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
